@@ -3,349 +3,356 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TurnNat Benchmark</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>TurnNat: Automatic Evaluation of Turn-Taking Naturalness in Dyadic Spoken Dialogue</title>
+
   <style>
     :root {
       --ink: #172033;
-      --muted: #5d6978;
+      --muted: #5f6c7b;
       --paper: #ffffff;
-      --soft: #f5f7fb;
-      --line: #e3e8f0;
-      --blue: #3157d5;
-      --green: #1f9d7a;
-      --shadow: 0 12px 30px rgba(28, 41, 61, 0.08);
-      --radius: 14px;
+      --soft: #f6f8fb;
+      --line: #e6ebf2;
+      --blue: #4763ff;
+      --cyan: #30cfd0;
+      --violet: #8f5cff;
+      --shadow: 0 18px 45px rgba(31, 45, 61, 0.12);
+      --shadow-soft: 0 10px 30px rgba(31, 45, 61, 0.08);
+      --radius: 24px;
     }
 
-    * {
-      box-sizing: border-box;
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
-      margin: 0;
       color: var(--ink);
-      background: var(--soft);
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-      line-height: 1.55;
+      background:
+        radial-gradient(circle at top left, rgba(71, 99, 255, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(48, 207, 208, 0.12), transparent 28%),
+        var(--soft);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif;
     }
 
     a {
-      color: var(--blue);
-      text-decoration: none;
-      font-weight: 650;
-    }
-
-    a:hover {
-      text-decoration: underline;
+      color: #3451e8;
     }
 
     .hero {
-      color: #fff;
-      background: linear-gradient(135deg, #101827 0%, #1c3364 58%, #3157d5 100%);
-      padding: 68px 22px 58px;
+      position: relative;
+      overflow: hidden;
+      padding: 78px 0 62px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at 78% 8%, rgba(143, 92, 255, 0.18), transparent 34%),
+        radial-gradient(circle at 16% 92%, rgba(48, 207, 208, 0.14), transparent 30%),
+        linear-gradient(135deg, #111827 0%, #263c73 50%, #4864f2 100%);
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(72px);
+      opacity: 0.28;
+    }
+
+    .hero::before {
+      width: 460px;
+      height: 220px;
+      right: -150px;
+      top: -100px;
+      background: rgba(143, 92, 255, 0.45);
+    }
+
+    .hero::after {
+      width: 380px;
+      height: 180px;
+      left: -120px;
+      bottom: -90px;
+      background: rgba(48, 207, 208, 0.35);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px;
       text-align: center;
     }
 
-    .hero-inner {
-      max-width: 980px;
-      margin: 0 auto;
-    }
-
-    .tag {
-      display: inline-block;
-      padding: 7px 12px;
-      margin-bottom: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 999px;
-      color: rgba(255, 255, 255, 0.88);
-      background: rgba(255, 255, 255, 0.09);
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0 auto 16px;
-      max-width: 900px;
-      font-size: clamp(32px, 5vw, 56px);
+    .paper-title {
+      font-size: clamp(36px, 5vw, 62px);
+      font-weight: 750;
       line-height: 1.08;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
+      margin: 0 auto 18px;
     }
 
-    .subtitle {
-      max-width: 800px;
-      margin: 0 auto;
-      color: rgba(255, 255, 255, 0.86);
-      font-size: 18px;
+    .author-line {
+      font-size: 21px;
+      color: rgba(255, 255, 255, 0.88);
+      margin-bottom: 28px;
     }
 
-    .actions {
+    .hero-actions {
       display: flex;
+      gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
+      margin-top: 24px;
     }
 
-    .button {
+    .hero-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 42px;
-      padding: 10px 17px;
+      padding: 12px 18px;
       border-radius: 999px;
+      font-weight: 650;
       text-decoration: none;
-      font-weight: 720;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     }
 
-    .button.primary {
-      color: #111827;
-      background: #fff;
+    .hero-button:hover {
+      transform: translateY(-2px);
+      text-decoration: none;
     }
 
-    .button.secondary {
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      background: rgba(255, 255, 255, 0.1);
+    .hero-button.primary {
+      color: #0f172a;
+      background: #ffffff;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
     }
 
-    .page {
-      max-width: 1120px;
-      margin: -28px auto 0;
-      padding: 0 20px 46px;
+    .hero-button.secondary {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
     }
 
-    .card {
-      margin-bottom: 22px;
-      padding: 28px;
-      border: 1px solid var(--line);
+    .page-shell {
+      max-width: 1180px;
+      margin: -34px auto 0;
+      padding: 0 22px 48px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(230, 235, 242, 0.9);
       border-radius: var(--radius);
-      background: var(--paper);
-      box-shadow: var(--shadow);
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(8px);
     }
 
-    .section-label {
-      margin-bottom: 8px;
+    .abstract-box {
+      padding: 30px 32px;
+      margin-bottom: 28px;
+      font-size: 17px;
+      line-height: 1.65;
+    }
+
+    .abstract-box b {
+      font-size: 18px;
+    }
+
+    .section-card {
+      padding: 34px 28px;
+      margin-bottom: 28px;
+    }
+
+    .section-eyebrow {
       color: var(--blue);
-      font-size: 13px;
-      font-weight: 780;
+      font-weight: 750;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: 28px;
-      letter-spacing: -0.02em;
-    }
-
-    p {
-      margin: 0 0 12px;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .stat {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcff;
-    }
-
-    .stat strong {
-      display: block;
-      margin-bottom: 5px;
-      font-size: 25px;
-      line-height: 1;
-    }
-
-    .stat span {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .type-card {
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcff;
-    }
-
-    .type-card h3 {
-      margin: 0 0 8px;
-      font-size: 16px;
-    }
-
-    .type-card p {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .resource-list {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .resource {
-      padding: 18px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fbfcff;
-    }
-
-    .resource h3 {
-      margin: 0 0 8px;
-      font-size: 17px;
-    }
-
-    .resource p {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .audio-table {
-      width: 100%;
-      border-collapse: collapse;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-    }
-
-    .audio-table th,
-    .audio-table td {
-      padding: 13px;
-      border-bottom: 1px solid var(--line);
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    .audio-table th {
-      background: #f2f5fa;
-      font-size: 14px;
-    }
-
-    .audio-table tr:last-child td {
-      border-bottom: 0;
-    }
-
-    .chip {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 999px;
-      color: #173f35;
-      background: #dcf5ed;
       font-size: 13px;
-      font-weight: 720;
-      white-space: nowrap;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .section-title {
+      text-align: center;
+      color: var(--ink);
+      font-weight: 760;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      max-width: 820px;
+      margin: 0 auto 26px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.55;
+    }
+
+    .figure-wrap {
+      text-align: center;
+      margin: 0;
+    }
+
+    .figure-wrap img {
+      display: block;
+      margin: 0 auto;
+      border-radius: 18px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .framework-img {
+      max-width: 980px;
+      width: 100%;
+      height: auto;
+      padding: 8px;
+    }
+
+    .placeholder-figure {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      width: 100%;
+      border: 1px dashed #c5cfdd;
+      border-radius: 18px;
+      background: #fbfcff;
+      color: var(--muted);
+      font-weight: 650;
+      box-shadow: var(--shadow-soft);
+    }
+
+    figcaption {
+      color: var(--muted);
+      max-width: 940px;
+      margin: 14px auto 0;
+      font-size: 15px;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    .demo-list {
+      display: grid;
+      gap: 22px;
+    }
+
+    .demo-card {
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .demo-head {
+      padding: 18px 22px;
+      background: linear-gradient(90deg, rgba(71, 99, 255, 0.12), rgba(48, 207, 208, 0.12));
+      border-bottom: 1px solid var(--line);
+      font-weight: 760;
+      font-size: 18px;
+    }
+
+    .demo-body {
+      padding: 20px 22px 22px;
+    }
+
+    .pair-figure {
+      margin-bottom: 18px;
+    }
+
+    .pair-figure img {
+      width: 100%;
+      max-width: 980px;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+    }
+
+    .pair-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 210px;
+      width: 100%;
+      border: 1px dashed #c5cfdd;
+      border-radius: 14px;
+      background: #fbfcff;
+      color: var(--muted);
+      font-weight: 650;
+    }
+
+    .audio-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .audio-box {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fbfcff;
+    }
+
+    .audio-label {
+      display: block;
+      font-weight: 750;
+      margin-bottom: 8px;
     }
 
     audio {
       width: 100%;
-      min-width: 190px;
-      height: 34px;
+      height: 36px;
     }
 
-    code {
-      padding: 2px 5px;
-      border-radius: 5px;
-      background: #eef2f7;
-      color: #27364a;
+    .reference-box,
+    .disclaimer-box {
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .reference-box b,
+    .disclaimer-box b {
+      color: var(--ink);
+    }
+
+    .reference-box span {
+      display: block;
+      margin-bottom: 8px;
     }
 
     footer {
       color: var(--muted);
       text-align: center;
-      padding: 12px 20px 38px;
+      padding: 26px 16px 36px;
       font-size: 14px;
     }
 
-    @media (max-width: 920px) {
-      .stats,
-      .grid,
-      .resource-list {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .page {
-        margin-top: -16px;
+    @media (max-width: 900px) {
+      .page-shell {
+        margin-top: -20px;
       }
 
-      .card {
-        padding: 22px 18px;
+      .abstract-box,
+      .section-card {
+        padding: 24px 20px;
       }
 
-      .stats,
-      .grid,
-      .resource-list {
+      .audio-grid {
         grid-template-columns: 1fr;
-      }
-
-      .audio-table,
-      .audio-table tbody,
-      .audio-table tr,
-      .audio-table th,
-      .audio-table td {
-        display: block;
-        width: 100%;
-      }
-
-      .audio-table thead {
-        display: none;
-      }
-
-      .audio-table tr {
-        border-bottom: 1px solid var(--line);
-      }
-
-      .audio-table td {
-        border-bottom: 0;
-      }
-
-      .audio-table td::before {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 760;
-        text-transform: uppercase;
-      }
-
-      .audio-table td:nth-child(1)::before {
-        content: "Perturbation";
-      }
-
-      .audio-table td:nth-child(2)::before {
-        content: "Natural";
-      }
-
-      .audio-table td:nth-child(3)::before {
-        content: "Perturbed";
-      }
-
-      .audio-table td:nth-child(4)::before {
-        content: "Note";
       }
     }
   </style>
@@ -353,205 +360,201 @@
 
 <body>
   <header class="hero">
-    <div class="hero-inner">
-      <div class="tag">Anonymous Project Page</div>
-      <h1>TurnNat: Evaluating Turn-Taking Naturalness in Spoken Dialogue</h1>
-      <p class="subtitle">
-        A controlled perturbation benchmark for testing whether automatic scorers can distinguish natural
-        conversational timing from matched turn-taking perturbations.
-      </p>
-      <div class="actions">
-        <a class="button primary" href="#demos">Listen to Demos</a>
-        <a class="button secondary" href="https://github.com/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Anonymous GitHub</a>
-        <a class="button secondary" href="https://huggingface.co/datasets/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Hugging Face</a>
-        <a class="button secondary" href="#citation">Citation</a>
+    <div class="hero-content">
+      <h1 class="paper-title">TurnNat: Automatic Evaluation of Turn-Taking Naturalness in Dyadic Spoken Dialogue</h1>
+      <p class="author-line"><i>Anonymous Authors</i></p>
+      <div class="hero-actions">
+        <a class="hero-button primary" href="#samples">Listen to Samples</a>
+        <a class="hero-button secondary" href="#framework">View Framework</a>
+        <a class="hero-button secondary" href="https://github.com/hzted/turnnat-benchmark" target="_blank"
+          rel="noopener noreferrer">GitHub</a>
+        <a class="hero-button secondary" href="https://huggingface.co/datasets/hzted/turnnat-benchmark" target="_blank"
+          rel="noopener noreferrer">Hugging Face</a>
+        <a class="hero-button secondary" href="./paper.pdf" target="_blank" rel="noopener noreferrer">Paper</a>
       </div>
     </div>
   </header>
 
-  <main class="page">
-    <section class="card">
-      <div class="section-label">Overview</div>
-      <h2>Benchmark Summary</h2>
-      <p>
-        TurnNat studies automatic evaluation of turn-taking naturalness in two-channel spoken dialogue.
-        Each benchmark item contains a natural dialogue clip and a matched perturbed version, where the
-        perturbation changes conversational timing while preserving speaker identity, lexical content, and
-        recording conditions as much as possible.
+  <main class="page-shell">
+    <section class="abstract-box card-panel">
+      <b>Abstract:</b>
+      Turn-taking naturalness is central to full-duplex spoken dialogue systems, yet its automatic evaluation remains
+      limited. Existing evaluations often rely on human judgments or behavior-specific timing metrics, making it
+      difficult to compare heterogeneous timing failures within a unified framework. We propose TurnNat, a
+      likelihood-based framework for automatic turn-taking naturalness evaluation in two-channel spoken dialogue. A
+      causal turn-taking prediction model trained on natural conversations estimates future two-speaker voice-activity
+      states, and the negative log-likelihood (NLL) of the observed future activity measures timing atypicality. TurnNat
+      pools frame-level NLLs over turn-taking boundary units (TBUs) extracted from utterance onsets and offsets, and
+      aggregates mean and tail TBU scores into a dialogue-level naturalness score. We further construct a controlled
+      perturbation benchmark of paired natural and perturbed dialogue clips, validated by human naturalness judgments.
+      Experiments on this benchmark show that TurnNat successfully identifies unnatural turn-taking perturbations across
+      heterogeneous timing failures.
+    </section>
+
+    <section id="framework" class="section-card card-panel">
+      <div class="section-eyebrow">Framework</div>
+      <h2 class="section-title">TurnNat Scoring Framework</h2>
+      <p class="section-subtitle">
+        TurnNat extracts VAD-based turn-taking boundary units and uses a causal future voice-activity prediction model
+        to score the likelihood of observed two-speaker activity patterns.
       </p>
-      <p class="muted">
-        The released resources will include code, perturbation manifests, analysis scripts, and a small set of
-        demo audio examples. Full data access will depend on the redistribution terms of the underlying speech data.
+      <figure class="figure-wrap">
+        <div class="placeholder-figure">Place framework figure here: figures/turnnat_framework.png</div>
+        <!-- Replace the placeholder above with:
+        <img src="figures/turnnat_framework.png" class="framework-img" alt="TurnNat framework">
+        -->
+        <figcaption>
+          Figure 1: Overview of the TurnNat framework. TurnNat first extracts VAD-based turn-taking boundary units from
+          the two-channel dialogue, then uses a causal turn-taking prediction model to assign likelihoods to future
+          two-speaker voice-activity states at frames inside these units.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="samples" class="section-card card-panel">
+      <div class="section-eyebrow">Audio Demo</div>
+      <h2 class="section-title">Representative Natural-Perturbed Pairs</h2>
+      <p class="section-subtitle">
+        Each example pairs the original natural clip with a matched perturbation. The figure slot is reserved for the
+        waveform, TBU-NLL, and perturbation-region visualization used in the paper.
       </p>
-      <div class="stats">
-        <div class="stat">
-          <strong>5</strong>
-          <span>turn-taking perturbation types</span>
-        </div>
-        <div class="stat">
-          <strong>paired</strong>
-          <span>natural and perturbed clips</span>
-        </div>
-        <div class="stat">
-          <strong>2-ch</strong>
-          <span>speaker-separated dialogue audio</span>
-        </div>
-        <div class="stat">
-          <strong>scale-free</strong>
-          <span>matched-pair evaluation metrics</span>
-        </div>
+
+      <div class="demo-list">
+        <article class="demo-card">
+          <div class="demo-head">Late Response</div>
+          <div class="demo-body">
+            <figure class="pair-figure">
+              <div class="pair-placeholder">Place pair figure here: figures/late_response_pair.png</div>
+            </figure>
+            <div class="audio-grid">
+              <div class="audio-box">
+                <span class="audio-label">Natural</span>
+                <audio controls>
+                  <source src="assets/audio/late_response/example_01_natural.wav" type="audio/wav">
+                </audio>
+              </div>
+              <div class="audio-box">
+                <span class="audio-label">Perturbed</span>
+                <audio controls>
+                  <source src="assets/audio/late_response/example_01_perturbed.wav" type="audio/wav">
+                </audio>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card">
+          <div class="demo-head">Early Entry</div>
+          <div class="demo-body">
+            <figure class="pair-figure">
+              <div class="pair-placeholder">Place pair figure here: figures/early_entry_pair.png</div>
+            </figure>
+            <div class="audio-grid">
+              <div class="audio-box">
+                <span class="audio-label">Natural</span>
+                <audio controls>
+                  <source src="assets/audio/early_entry/example_01_natural.wav" type="audio/wav">
+                </audio>
+              </div>
+              <div class="audio-box">
+                <span class="audio-label">Perturbed</span>
+                <audio controls>
+                  <source src="assets/audio/early_entry/example_01_perturbed.wav" type="audio/wav">
+                </audio>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card">
+          <div class="demo-head">Hold Instead of Shift</div>
+          <div class="demo-body">
+            <figure class="pair-figure">
+              <div class="pair-placeholder">Place pair figure here: figures/hold_instead_shift_pair.png</div>
+            </figure>
+            <div class="audio-grid">
+              <div class="audio-box">
+                <span class="audio-label">Natural</span>
+                <audio controls>
+                  <source src="assets/audio/hold_instead_shift/example_01_natural.wav" type="audio/wav">
+                </audio>
+              </div>
+              <div class="audio-box">
+                <span class="audio-label">Perturbed</span>
+                <audio controls>
+                  <source src="assets/audio/hold_instead_shift/example_01_perturbed.wav" type="audio/wav">
+                </audio>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card">
+          <div class="demo-head">Shift Instead of Hold</div>
+          <div class="demo-body">
+            <figure class="pair-figure">
+              <div class="pair-placeholder">Place pair figure here: figures/shift_instead_hold_pair.png</div>
+            </figure>
+            <div class="audio-grid">
+              <div class="audio-box">
+                <span class="audio-label">Natural</span>
+                <audio controls>
+                  <source src="assets/audio/shift_instead_hold/example_01_natural.wav" type="audio/wav">
+                </audio>
+              </div>
+              <div class="audio-box">
+                <span class="audio-label">Perturbed</span>
+                <audio controls>
+                  <source src="assets/audio/shift_instead_hold/example_01_perturbed.wav" type="audio/wav">
+                </audio>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="demo-card">
+          <div class="demo-head">Excessive Backchanneling</div>
+          <div class="demo-body">
+            <figure class="pair-figure">
+              <div class="pair-placeholder">Place pair figure here: figures/excessive_backchanneling_pair.png</div>
+            </figure>
+            <div class="audio-grid">
+              <div class="audio-box">
+                <span class="audio-label">Natural</span>
+                <audio controls>
+                  <source src="assets/audio/excessive_backchanneling/example_01_natural.wav" type="audio/wav">
+                </audio>
+              </div>
+              <div class="audio-box">
+                <span class="audio-label">Perturbed</span>
+                <audio controls>
+                  <source src="assets/audio/excessive_backchanneling/example_01_perturbed.wav" type="audio/wav">
+                </audio>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
-    <section class="card">
-      <div class="section-label">Perturbation Benchmark</div>
-      <h2>Turn-Taking Perturbation Types</h2>
-      <p class="muted">
-        The benchmark targets timing errors that are common in spoken interaction but difficult to capture using
-        content-only metrics.
-      </p>
-      <div class="grid">
-        <div class="type-card">
-          <h3>Late Response</h3>
-          <p>Delays a responding utterance, creating an abnormally long response gap.</p>
-        </div>
-        <div class="type-card">
-          <h3>Early Entry</h3>
-          <p>Advances a response, creating premature overlap with the current speaker.</p>
-        </div>
-        <div class="type-card">
-          <h3>Hold Instead of Shift</h3>
-          <p>Removes a responding turn so the current speaker appears to retain the floor.</p>
-        </div>
-        <div class="type-card">
-          <h3>Shift Instead of Hold</h3>
-          <p>Inserts a response where the same speaker would normally continue.</p>
-        </div>
-        <div class="type-card">
-          <h3>Excessive Backchanneling</h3>
-          <p>Adds extra listener feedback in regions where the listener is originally silent.</p>
-        </div>
-      </div>
+    <section class="reference-box card-panel" id="references">
+      <b>References.</b>
+      <span id="ref-vap">[1] E. Ekstedt and G. Skantze. <i>Voice Activity Projection: Self-supervised Learning of Turn-taking Events.</i> Interspeech 2022.</span>
+      <span id="ref-dualturn">[2] S. Rajaa. <i>DualTurn: Learning Turn-taking from Dual-channel Generative Speech Pretraining.</i> arXiv:2603.08216, 2026.</span>
+      <span id="ref-seamless">[3] V. Agrawal et al. <i>Seamless Interaction: Dyadic Audiovisual Motion Modeling and Large-scale Dataset.</i> arXiv:2506.22554, 2025.</span>
+      <span id="ref-silero">[4] Silero Team. <i>Silero VAD: Pre-trained Enterprise-grade Voice Activity Detector.</i> GitHub repository, 2024.</span>
+      <span id="ref-bc">[5] J. Wang et al. <i>Turn-taking and Backchannel Prediction with Acoustic and Large Language Model Fusion.</i> ICASSP 2024.</span>
     </section>
 
-    <section class="card">
-      <div class="section-label">Resources</div>
-      <h2>Code and Data Release</h2>
-      <p>
-        This page points to the anonymous code repository and dataset location used for review. Replace the placeholder
-        URLs below before publishing the page.
-      </p>
-      <div class="resource-list">
-        <div class="resource">
-          <h3>Anonymous GitHub</h3>
-          <p>Code for benchmark construction, scoring, and paper analyses.</p>
-          <a href="https://github.com/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Open repository</a>
-        </div>
-        <div class="resource">
-          <h3>Hugging Face Dataset</h3>
-          <p>Benchmark manifests and, where permitted, demo audio or released audio data.</p>
-          <a href="https://huggingface.co/datasets/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Open dataset page</a>
-        </div>
-        <div class="resource">
-          <h3>Paper</h3>
-          <p>Anonymous manuscript or arXiv link, depending on release stage.</p>
-          <a href="#" target="_blank" rel="noopener noreferrer">Coming soon</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="demos" class="card">
-      <div class="section-label">Audio Demos</div>
-      <h2>Natural vs. Perturbed Examples</h2>
-      <p class="muted">
-        A few short paired examples help visitors hear the timing contrast directly. Keep this section small for
-        anonymous review; the full benchmark can be linked through the dataset page after license checks.
-      </p>
-      <table class="audio-table">
-        <thead>
-          <tr>
-            <th style="width: 18%;">Perturbation</th>
-            <th>Natural Clip</th>
-            <th>Perturbed Clip</th>
-            <th style="width: 25%;">What to Listen For</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="chip">Late response</span></td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/late_response/example_01_natural.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/late_response/example_01_perturbed.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td class="muted">The response arrives after an unusually long gap.</td>
-          </tr>
-          <tr>
-            <td><span class="chip">Early entry</span></td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/early_entry/example_01_natural.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/early_entry/example_01_perturbed.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td class="muted">The response enters before the current speaker has naturally yielded.</td>
-          </tr>
-          <tr>
-            <td><span class="chip">Backchanneling</span></td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/backchannel/example_01_natural.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td>
-              <audio controls>
-                <source src="assets/audio/backchannel/example_01_perturbed.wav" type="audio/wav">
-              </audio>
-            </td>
-            <td class="muted">Extra listener feedback makes the exchange feel over-interrupted.</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section id="citation" class="card">
-      <div class="section-label">Citation</div>
-      <h2>Citation</h2>
-      <p class="muted">Use this placeholder during anonymous review. Replace it with the final citation after publication.</p>
-      <pre><code>@inproceedings{anonymous2026turnnat,
-  title     = {TurnNat: Evaluating Turn-Taking Naturalness in Spoken Dialogue},
-  author    = {Anonymous Authors},
-  booktitle = {Anonymous Submission},
-  year      = {2026}
-}</code></pre>
-    </section>
-
-    <section class="card">
-      <div class="section-label">Release Note</div>
-      <h2>Data Use and Anonymity</h2>
-      <p>
-        This anonymous page is intended for review and demonstration. The full release will be coordinated with the
-        redistribution terms of the source dialogue data and any applicable participant-consent constraints.
-      </p>
-      <p class="muted">
-        Before publishing, replace all <code>ANON-USER</code> placeholders and check the repository, dataset card,
-        file names, commit metadata, and audio paths for identifying information.
-      </p>
+    <section class="disclaimer-box card-panel">
+      <b>Disclaimer:</b> Audio examples are provided for research demonstration purposes only.
     </section>
   </main>
 
   <footer>
-    TurnNat benchmark project page. Anonymous review version.
+    Demo website for TurnNat.
   </footer>
+
 </body>
 
 </html>
