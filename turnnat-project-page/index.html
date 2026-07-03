@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TurnNat Benchmark</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5d6978;
+      --paper: #ffffff;
+      --soft: #f5f7fb;
+      --line: #e3e8f0;
+      --blue: #3157d5;
+      --green: #1f9d7a;
+      --shadow: 0 12px 30px rgba(28, 41, 61, 0.08);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--soft);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .hero {
+      color: #fff;
+      background: linear-gradient(135deg, #101827 0%, #1c3364 58%, #3157d5 100%);
+      padding: 68px 22px 58px;
+      text-align: center;
+    }
+
+    .hero-inner {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 7px 12px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.09);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 auto 16px;
+      max-width: 900px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      max-width: 800px;
+      margin: 0 auto;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 18px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 17px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 720;
+    }
+
+    .button.primary {
+      color: #111827;
+      background: #fff;
+    }
+
+    .button.secondary {
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: -28px auto 0;
+      padding: 0 20px 46px;
+    }
+
+    .card {
+      margin-bottom: 22px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .section-label {
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 780;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      margin: 0 0 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcff;
+    }
+
+    .stat strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .type-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcff;
+    }
+
+    .type-card h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .type-card p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .resource-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .resource {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fbfcff;
+    }
+
+    .resource h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+    }
+
+    .resource p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .audio-table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .audio-table th,
+    .audio-table td {
+      padding: 13px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .audio-table th {
+      background: #f2f5fa;
+      font-size: 14px;
+    }
+
+    .audio-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .chip {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: #173f35;
+      background: #dcf5ed;
+      font-size: 13px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    audio {
+      width: 100%;
+      min-width: 190px;
+      height: 34px;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #eef2f7;
+      color: #27364a;
+    }
+
+    footer {
+      color: var(--muted);
+      text-align: center;
+      padding: 12px 20px 38px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .stats,
+      .grid,
+      .resource-list {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .page {
+        margin-top: -16px;
+      }
+
+      .card {
+        padding: 22px 18px;
+      }
+
+      .stats,
+      .grid,
+      .resource-list {
+        grid-template-columns: 1fr;
+      }
+
+      .audio-table,
+      .audio-table tbody,
+      .audio-table tr,
+      .audio-table th,
+      .audio-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .audio-table thead {
+        display: none;
+      }
+
+      .audio-table tr {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .audio-table td {
+        border-bottom: 0;
+      }
+
+      .audio-table td::before {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 760;
+        text-transform: uppercase;
+      }
+
+      .audio-table td:nth-child(1)::before {
+        content: "Perturbation";
+      }
+
+      .audio-table td:nth-child(2)::before {
+        content: "Natural";
+      }
+
+      .audio-table td:nth-child(3)::before {
+        content: "Perturbed";
+      }
+
+      .audio-table td:nth-child(4)::before {
+        content: "Note";
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="tag">Anonymous Project Page</div>
+      <h1>TurnNat: Evaluating Turn-Taking Naturalness in Spoken Dialogue</h1>
+      <p class="subtitle">
+        A controlled perturbation benchmark for testing whether automatic scorers can distinguish natural
+        conversational timing from matched turn-taking perturbations.
+      </p>
+      <div class="actions">
+        <a class="button primary" href="#demos">Listen to Demos</a>
+        <a class="button secondary" href="https://github.com/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Anonymous GitHub</a>
+        <a class="button secondary" href="https://huggingface.co/datasets/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Hugging Face</a>
+        <a class="button secondary" href="#citation">Citation</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="card">
+      <div class="section-label">Overview</div>
+      <h2>Benchmark Summary</h2>
+      <p>
+        TurnNat studies automatic evaluation of turn-taking naturalness in two-channel spoken dialogue.
+        Each benchmark item contains a natural dialogue clip and a matched perturbed version, where the
+        perturbation changes conversational timing while preserving speaker identity, lexical content, and
+        recording conditions as much as possible.
+      </p>
+      <p class="muted">
+        The released resources will include code, perturbation manifests, analysis scripts, and a small set of
+        demo audio examples. Full data access will depend on the redistribution terms of the underlying speech data.
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <strong>5</strong>
+          <span>turn-taking perturbation types</span>
+        </div>
+        <div class="stat">
+          <strong>paired</strong>
+          <span>natural and perturbed clips</span>
+        </div>
+        <div class="stat">
+          <strong>2-ch</strong>
+          <span>speaker-separated dialogue audio</span>
+        </div>
+        <div class="stat">
+          <strong>scale-free</strong>
+          <span>matched-pair evaluation metrics</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-label">Perturbation Benchmark</div>
+      <h2>Turn-Taking Perturbation Types</h2>
+      <p class="muted">
+        The benchmark targets timing errors that are common in spoken interaction but difficult to capture using
+        content-only metrics.
+      </p>
+      <div class="grid">
+        <div class="type-card">
+          <h3>Late Response</h3>
+          <p>Delays a responding utterance, creating an abnormally long response gap.</p>
+        </div>
+        <div class="type-card">
+          <h3>Early Entry</h3>
+          <p>Advances a response, creating premature overlap with the current speaker.</p>
+        </div>
+        <div class="type-card">
+          <h3>Hold Instead of Shift</h3>
+          <p>Removes a responding turn so the current speaker appears to retain the floor.</p>
+        </div>
+        <div class="type-card">
+          <h3>Shift Instead of Hold</h3>
+          <p>Inserts a response where the same speaker would normally continue.</p>
+        </div>
+        <div class="type-card">
+          <h3>Excessive Backchanneling</h3>
+          <p>Adds extra listener feedback in regions where the listener is originally silent.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-label">Resources</div>
+      <h2>Code and Data Release</h2>
+      <p>
+        This page points to the anonymous code repository and dataset location used for review. Replace the placeholder
+        URLs below before publishing the page.
+      </p>
+      <div class="resource-list">
+        <div class="resource">
+          <h3>Anonymous GitHub</h3>
+          <p>Code for benchmark construction, scoring, and paper analyses.</p>
+          <a href="https://github.com/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Open repository</a>
+        </div>
+        <div class="resource">
+          <h3>Hugging Face Dataset</h3>
+          <p>Benchmark manifests and, where permitted, demo audio or released audio data.</p>
+          <a href="https://huggingface.co/datasets/ANON-USER/turnnat-benchmark" target="_blank" rel="noopener noreferrer">Open dataset page</a>
+        </div>
+        <div class="resource">
+          <h3>Paper</h3>
+          <p>Anonymous manuscript or arXiv link, depending on release stage.</p>
+          <a href="#" target="_blank" rel="noopener noreferrer">Coming soon</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="demos" class="card">
+      <div class="section-label">Audio Demos</div>
+      <h2>Natural vs. Perturbed Examples</h2>
+      <p class="muted">
+        A few short paired examples help visitors hear the timing contrast directly. Keep this section small for
+        anonymous review; the full benchmark can be linked through the dataset page after license checks.
+      </p>
+      <table class="audio-table">
+        <thead>
+          <tr>
+            <th style="width: 18%;">Perturbation</th>
+            <th>Natural Clip</th>
+            <th>Perturbed Clip</th>
+            <th style="width: 25%;">What to Listen For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="chip">Late response</span></td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/late_response/example_01_natural.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/late_response/example_01_perturbed.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td class="muted">The response arrives after an unusually long gap.</td>
+          </tr>
+          <tr>
+            <td><span class="chip">Early entry</span></td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/early_entry/example_01_natural.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/early_entry/example_01_perturbed.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td class="muted">The response enters before the current speaker has naturally yielded.</td>
+          </tr>
+          <tr>
+            <td><span class="chip">Backchanneling</span></td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/backchannel/example_01_natural.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td>
+              <audio controls>
+                <source src="assets/audio/backchannel/example_01_perturbed.wav" type="audio/wav">
+              </audio>
+            </td>
+            <td class="muted">Extra listener feedback makes the exchange feel over-interrupted.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="citation" class="card">
+      <div class="section-label">Citation</div>
+      <h2>Citation</h2>
+      <p class="muted">Use this placeholder during anonymous review. Replace it with the final citation after publication.</p>
+      <pre><code>@inproceedings{anonymous2026turnnat,
+  title     = {TurnNat: Evaluating Turn-Taking Naturalness in Spoken Dialogue},
+  author    = {Anonymous Authors},
+  booktitle = {Anonymous Submission},
+  year      = {2026}
+}</code></pre>
+    </section>
+
+    <section class="card">
+      <div class="section-label">Release Note</div>
+      <h2>Data Use and Anonymity</h2>
+      <p>
+        This anonymous page is intended for review and demonstration. The full release will be coordinated with the
+        redistribution terms of the source dialogue data and any applicable participant-consent constraints.
+      </p>
+      <p class="muted">
+        Before publishing, replace all <code>ANON-USER</code> placeholders and check the repository, dataset card,
+        file names, commit metadata, and audio paths for identifying information.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    TurnNat benchmark project page. Anonymous review version.
+  </footer>
+</body>
+
+</html>
