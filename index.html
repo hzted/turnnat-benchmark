@@ -212,21 +212,20 @@
       max-width: 980px;
       width: 100%;
       height: auto;
-      padding: 8px;
     }
 
-    .placeholder-figure {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 280px;
-      width: 100%;
-      border: 1px dashed #c5cfdd;
+    .figure-image-frame {
+      max-width: 980px;
+      margin: 0 auto;
       border-radius: 18px;
-      background: #fbfcff;
-      color: var(--muted);
-      font-weight: 650;
+      background: #ffffff;
       box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .figure-image-frame img {
+      border-radius: 18px;
+      box-shadow: none;
     }
 
     .results-grid {
@@ -252,21 +251,33 @@
 
     .result-body {
       padding: 18px 20px 20px;
+      overflow-x: auto;
     }
 
-    .table-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 190px;
+    .table-frame {
       width: 100%;
-      border: 1px dashed #c5cfdd;
       border-radius: 14px;
-      background: #fbfcff;
-      color: var(--muted);
-      font-weight: 650;
-      text-align: center;
-      padding: 20px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .result-table-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+    }
+
+    .wide-table-img {
+      width: 1280px;
+      max-width: none;
+    }
+
+    .table-frame.narrow-table {
+      max-width: 760px;
+      margin: 0 auto;
     }
 
     .result-caption {
@@ -336,6 +347,22 @@
       background: #fbfcff;
       color: var(--muted);
       font-weight: 650;
+    }
+
+    .pair-image-frame {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .pair-image-frame img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 0;
+      border-radius: 14px;
     }
 
     .audio-grid {
@@ -447,10 +474,9 @@
         <a href="#ref-dualturn">[2]</a>.
       </p>
       <figure class="figure-wrap">
-        <div class="placeholder-figure"><img src="figures/framework.png" class="framework-img" alt="TurnNat framework"></div>
-        <!-- Replace the placeholder above with:
-        <img src="figures/turnnat_framework.png" class="framework-img" alt="TurnNat framework">
-        -->
+        <div class="figure-image-frame">
+          <img src="figures/framework.png" class="framework-img" alt="TurnNat framework">
+        </div>
         <figcaption>
           Figure 1: Overview of the TurnNat framework. TurnNat first extracts VAD-based turn-taking boundary units from
           the two-channel dialogue, then uses a causal turn-taking prediction model to assign likelihoods to future
@@ -475,7 +501,9 @@
         <article class="result-panel">
           <div class="result-head">Human Validation Results</div>
           <div class="result-body">
-            <div class="table-placeholder"><img src="figures/human_validation_table.png" class="result-table-img" alt="Human validation results table"></div>
+            <div class="table-frame narrow-table">
+              <img src="figures/human_validation_table.png" class="result-table-img" alt="Human validation results table">
+            </div>
             <p class="result-caption">
               Table slot for natural preference rate, majority-natural preference, naturalness-rating difference, and
               artifact-rating difference by perturbation type.
@@ -486,7 +514,9 @@
         <article class="result-panel">
           <div class="result-head">Automatic Discrimination Results</div>
           <div class="result-body">
-            <div class="table-placeholder"><img src="figures/automatic_discrimination_table.png" class="result-table-img" alt="Automatic discrimination results table"></div>
+            <div class="table-frame">
+              <img src="figures/automatic_discrimination_table.png" class="result-table-img wide-table-img" alt="Automatic discrimination results table">
+            </div>
             <p class="result-caption">
               Table slot for TurnNat variants, including VAP and DualTurn backbones, C-index, matched-pair accuracy,
               and per-perturbation-type results.
@@ -510,19 +540,21 @@
           <div class="demo-head">Late Response</div>
           <div class="demo-body">
             <figure class="pair-figure">
-              <div class="pair-placeholder"><img src="figures/late_response_pair.png" class="result-table-img" alt="Late response pair figure"></div>
+              <div class="pair-image-frame">
+                <img src="figures/waveform_tbu_nll_late_response.png" alt="Late response pair figure">
+              </div>
             </figure>
             <div class="audio-grid">
               <div class="audio-box">
                 <span class="audio-label">Natural</span>
                 <audio controls>
-                  <source src="assets/audio/late_response/example_01_natural.wav" type="audio/wav">
+                  <source src="assets/audio/late_response/natural.wav" type="audio/wav">
                 </audio>
               </div>
               <div class="audio-box">
                 <span class="audio-label">Perturbed</span>
                 <audio controls>
-                  <source src="assets/audio/late_response/example_01_perturbed.wav" type="audio/wav">
+                  <source src="assets/audio/late_response/edited.wav" type="audio/wav">
                 </audio>
               </div>
             </div>
@@ -533,19 +565,21 @@
           <div class="demo-head">Early Entry</div>
           <div class="demo-body">
             <figure class="pair-figure">
-              <div class="pair-placeholder">Place pair figure here: figures/early_entry_pair.png</div>
+              <div class="pair-image-frame">
+                <img src="figures/waveform_tbu_nll_early_entry.png" alt="Early entry pair figure">
+              </div>
             </figure>
             <div class="audio-grid">
               <div class="audio-box">
                 <span class="audio-label">Natural</span>
                 <audio controls>
-                  <source src="assets/audio/early_entry/example_01_natural.wav" type="audio/wav">
+                  <source src="assets/audio/early_entry/natural.wav" type="audio/wav">
                 </audio>
               </div>
               <div class="audio-box">
                 <span class="audio-label">Perturbed</span>
                 <audio controls>
-                  <source src="assets/audio/early_entry/example_01_perturbed.wav" type="audio/wav">
+                  <source src="assets/audio/early_entry/edited.wav" type="audio/wav">
                 </audio>
               </div>
             </div>
@@ -556,19 +590,21 @@
           <div class="demo-head">Hold Instead of Shift</div>
           <div class="demo-body">
             <figure class="pair-figure">
-              <div class="pair-placeholder">Place pair figure here: figures/hold_instead_shift_pair.png</div>
+              <div class="pair-image-frame">
+                <img src="figures/waveform_tbu_nll_hold_instead_of_shift.png" alt="Hold instead of shift pair figure">
+              </div>
             </figure>
             <div class="audio-grid">
               <div class="audio-box">
                 <span class="audio-label">Natural</span>
                 <audio controls>
-                  <source src="assets/audio/hold_instead_shift/example_01_natural.wav" type="audio/wav">
+                  <source src="assets/audio/hold_instead_of_shift/natural.wav" type="audio/wav">
                 </audio>
               </div>
               <div class="audio-box">
                 <span class="audio-label">Perturbed</span>
                 <audio controls>
-                  <source src="assets/audio/hold_instead_shift/example_01_perturbed.wav" type="audio/wav">
+                  <source src="assets/audio/hold_instead_of_shift/edited.wav" type="audio/wav">
                 </audio>
               </div>
             </div>
@@ -579,19 +615,21 @@
           <div class="demo-head">Shift Instead of Hold</div>
           <div class="demo-body">
             <figure class="pair-figure">
-              <div class="pair-placeholder">Place pair figure here: figures/shift_instead_hold_pair.png</div>
+              <div class="pair-image-frame">
+                <img src="figures/waveform_tbu_nll_shift_instead_of_hold.png" alt="Shift instead of hold pair figure">
+              </div>
             </figure>
             <div class="audio-grid">
               <div class="audio-box">
                 <span class="audio-label">Natural</span>
                 <audio controls>
-                  <source src="assets/audio/shift_instead_hold/example_01_natural.wav" type="audio/wav">
+                  <source src="assets/audio/shift_instead_of_hold/natural.wav" type="audio/wav">
                 </audio>
               </div>
               <div class="audio-box">
                 <span class="audio-label">Perturbed</span>
                 <audio controls>
-                  <source src="assets/audio/shift_instead_hold/example_01_perturbed.wav" type="audio/wav">
+                  <source src="assets/audio/shift_instead_of_hold/edited.wav" type="audio/wav">
                 </audio>
               </div>
             </div>
@@ -602,19 +640,21 @@
           <div class="demo-head">Excessive Backchanneling</div>
           <div class="demo-body">
             <figure class="pair-figure">
-              <div class="pair-placeholder">Place pair figure here: figures/excessive_backchanneling_pair.png</div>
+              <div class="pair-image-frame">
+                <img src="figures/waveform_tbu_nll_excessive_backchannel.png" alt="Excessive backchanneling pair figure">
+              </div>
             </figure>
             <div class="audio-grid">
               <div class="audio-box">
                 <span class="audio-label">Natural</span>
                 <audio controls>
-                  <source src="assets/audio/excessive_backchanneling/example_01_natural.wav" type="audio/wav">
+                  <source src="assets/audio/excessive_backchannel/natural.wav" type="audio/wav">
                 </audio>
               </div>
               <div class="audio-box">
                 <span class="audio-label">Perturbed</span>
                 <audio controls>
-                  <source src="assets/audio/excessive_backchanneling/example_01_perturbed.wav" type="audio/wav">
+                  <source src="assets/audio/excessive_backchannel/edited.wav" type="audio/wav">
                 </audio>
               </div>
             </div>
