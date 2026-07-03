@@ -229,6 +229,53 @@
       box-shadow: var(--shadow-soft);
     }
 
+    .results-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .result-panel {
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .result-head {
+      padding: 16px 20px;
+      background: linear-gradient(90deg, rgba(71, 99, 255, 0.12), rgba(48, 207, 208, 0.12));
+      border-bottom: 1px solid var(--line);
+      font-weight: 760;
+      font-size: 17px;
+    }
+
+    .result-body {
+      padding: 18px 20px 20px;
+    }
+
+    .table-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 190px;
+      width: 100%;
+      border: 1px dashed #c5cfdd;
+      border-radius: 14px;
+      background: #fbfcff;
+      color: var(--muted);
+      font-weight: 650;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .result-caption {
+      color: var(--muted);
+      margin: 12px 0 0;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
     figcaption {
       color: var(--muted);
       max-width: 940px;
@@ -240,7 +287,7 @@
 
     .demo-list {
       display: grid;
-      gap: 22px;
+      gap: 16px;
     }
 
     .demo-card {
@@ -252,19 +299,19 @@
     }
 
     .demo-head {
-      padding: 18px 22px;
+      padding: 12px 18px;
       background: linear-gradient(90deg, rgba(71, 99, 255, 0.12), rgba(48, 207, 208, 0.12));
       border-bottom: 1px solid var(--line);
       font-weight: 760;
-      font-size: 18px;
+      font-size: 17px;
     }
 
     .demo-body {
-      padding: 20px 22px 22px;
+      padding: 14px 18px 16px;
     }
 
     .pair-figure {
-      margin-bottom: 18px;
+      margin-bottom: 12px;
     }
 
     .pair-figure img {
@@ -282,7 +329,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 210px;
+      min-height: 145px;
       width: 100%;
       border: 1px dashed #c5cfdd;
       border-radius: 14px;
@@ -294,20 +341,20 @@
     .audio-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      gap: 10px;
     }
 
     .audio-box {
       border: 1px solid var(--line);
       border-radius: 14px;
-      padding: 14px;
+      padding: 10px 12px;
       background: #fbfcff;
     }
 
     .audio-label {
       display: block;
       font-weight: 750;
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
     audio {
@@ -364,8 +411,8 @@
       <h1 class="paper-title">TurnNat: Automatic Evaluation of Turn-Taking Naturalness in Dyadic Spoken Dialogue</h1>
       <p class="author-line"><i>Anonymous Authors</i></p>
       <div class="hero-actions">
-        <a class="hero-button primary" href="#samples">Listen to Samples</a>
         <a class="hero-button secondary" href="#framework">View Framework</a>
+        <a class="hero-button primary" href="#samples">Listen to Samples</a>
         <a class="hero-button secondary" href="https://github.com/hzted/turnnat-benchmark" target="_blank"
           rel="noopener noreferrer">GitHub</a>
         <a class="hero-button secondary" href="https://huggingface.co/datasets/hzted/turnnat-benchmark" target="_blank"
@@ -395,8 +442,9 @@
       <div class="section-eyebrow">Framework</div>
       <h2 class="section-title">TurnNat Scoring Framework</h2>
       <p class="section-subtitle">
-        TurnNat extracts VAD-based turn-taking boundary units and uses a causal future voice-activity prediction model
-        to score the likelihood of observed two-speaker activity patterns.
+        TurnNat follows the future two-speaker voice-activity prediction formulation of Voice Activity Projection
+        <a href="#ref-vap">[1]</a> and instantiates the scorer with VAP- and DualTurn-based predictors
+        <a href="#ref-dualturn">[2]</a>.
       </p>
       <figure class="figure-wrap">
         <div class="placeholder-figure">Place framework figure here: figures/turnnat_framework.png</div>
@@ -409,6 +457,54 @@
           two-speaker voice-activity states at frames inside these units.
         </figcaption>
       </figure>
+    </section>
+
+    <section id="results" class="section-card card-panel">
+      <div class="section-eyebrow">Results</div>
+      <h2 class="section-title">Human Validation and Automatic Discrimination</h2>
+      <p class="section-subtitle">
+        The perturbation benchmark is constructed from the naturalistic portion of Seamless Interaction
+        <a href="#ref-seamless">[3]</a>. Candidate regions are extracted with Silero VAD
+        <a href="#ref-silero">[4]</a>. Late-response and early-entry perturbations are chosen relative to reported
+        human response-timing ranges around -200 to 400 ms <a href="#ref-sakuma">[6]</a>; hold/shift cases follow
+        the VAP shift/hold criterion <a href="#ref-vap">[1]</a>; and backchannels are identified using the
+        transcript-based criterion of Wang et al. <a href="#ref-bc">[5]</a>.
+      </p>
+
+      <div class="results-grid">
+        <article class="result-panel">
+          <div class="result-head">Human Validation Results</div>
+          <div class="result-body">
+            <div class="table-placeholder">Place human validation table here: figures/human_validation_table.png</div>
+            <p class="result-caption">
+              Table slot for natural preference rate, majority-natural preference, naturalness-rating difference, and
+              artifact-rating difference by perturbation type.
+            </p>
+          </div>
+        </article>
+
+        <article class="result-panel">
+          <div class="result-head">Automatic Discrimination Results</div>
+          <div class="result-body">
+            <div class="table-placeholder">Place automatic discrimination table here: figures/automatic_results_table.png</div>
+            <p class="result-caption">
+              Table slot for TurnNat variants, including VAP and DualTurn backbones, C-index, matched-pair accuracy,
+              and per-perturbation-type results.
+            </p>
+          </div>
+        </article>
+
+        <article class="result-panel">
+          <div class="result-head">Aggregation Ablation</div>
+          <div class="result-body">
+            <div class="table-placeholder">Place aggregation ablation table here: figures/aggregation_ablation_table.png</div>
+            <p class="result-caption">
+              Table slot for comparing all-frame averaging, TBU mean pooling, TBU tail pooling, and mean-plus-tail
+              aggregation.
+            </p>
+          </div>
+        </article>
+      </div>
     </section>
 
     <section id="samples" class="section-card card-panel">
@@ -544,6 +640,7 @@
       <span id="ref-seamless">[3] V. Agrawal et al. <i>Seamless Interaction: Dyadic Audiovisual Motion Modeling and Large-scale Dataset.</i> arXiv:2506.22554, 2025.</span>
       <span id="ref-silero">[4] Silero Team. <i>Silero VAD: Pre-trained Enterprise-grade Voice Activity Detector.</i> GitHub repository, 2024.</span>
       <span id="ref-bc">[5] J. Wang et al. <i>Turn-taking and Backchannel Prediction with Acoustic and Large Language Model Fusion.</i> ICASSP 2024.</span>
+      <span id="ref-sakuma">[6] J. Sakuma, S. Fujie, and T. Kobayashi. <i>Response Timing Estimation for Spoken Dialog Systems Based on Syntactic Completeness Prediction.</i> IEEE SLT 2022.</span>
     </section>
 
     <section class="disclaimer-box card-panel">
