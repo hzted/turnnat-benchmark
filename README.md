@@ -14,12 +14,13 @@ evaluation is run as a standalone post-training step.
 <p align="center">
   <em>Figure 1. Overview of the TurnNat framework.</em>
 </p>
-This repository hosts the project page and release links for the TurnNat benchmark.
+
 
 ## TurnNat Benchmark
+This repository hosts the project page and release links for the TurnNat benchmark.
+
 Project page and Demo: https://hzted.github.io/turnnat-benchmark/
 
-This repository hosts the project page and release links for the TurnNat benchmark.
 
 
 
