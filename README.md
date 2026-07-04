@@ -1,5 +1,354 @@
-# TurnNat Benchmark
+# Turn-Taking Naturalness
 
-Project page: https://hzted.github.io/turnnat-benchmark/
+Minimal code for generating five conversational timing perturbations, training
+FVAD models, and scoring paired natural/perturbed conversations with NLL.
 
+The public pipeline keeps perturbation generation and model evaluation separate.
+Perturbed samples are produced from data-only timing and VAD rules; checkpoint
+evaluation is run as a standalone post-training step.
+
+## TurnNat Benchmark
+
+<p align="center">
+  <img src="figures/framework.png" alt="TurnNat framework overview" width="850">
+</p>
+
+<p align="center">
+  <em>Figure 1. Overview of the TurnNat framework.</em>
+</p>
 This repository hosts the project page and release links for the TurnNat benchmark.
+
+
+## Setup
+
+There are two requirements files because data generation and model training have
+very different dependency footprints:
+
+- `requirements.txt`: lightweight dependencies for perturbation generation.
+- `requirements-train.txt`: optional model stack for FVAD training and checkpoint evaluation.
+
+For data generation only:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+For model training or checkpoint evaluation:
+
+```bash
+pip install -r requirements-train.txt
+pip install -e VAP-main
+```
+
+Checkpoint and data locations:
+
+- Turn-Taking Naturalness benchmark dataset: Hugging Face dataset link coming soon.
+- Released TurnNat FVAD checkpoint: Hugging Face model link coming soon. Download
+  it to `checkpoints/turn_taking_naturalness_fvad.pt`, or pass the downloaded
+  path with `--checkpoint`.
+- Official DualTurn backbone/checkpoint: [`anyreach-ai/dualturn-qwen2.5-mimi-0.5B`](https://huggingface.co/anyreach-ai/dualturn-qwen2.5-mimi-0.5B).
+  The DualTurn scripts load this model from Hugging Face by default. For offline
+  runs, pre-cache it with Hugging Face/Transformers and use `--local-files-only`.
+- Official VAP code/checkpoint example: [`ErikEkstedt/VAP`](https://github.com/ErikEkstedt/VAP).
+  The VAP scorer/trainer expects the raw state dict at
+  `VAP-main/example/checkpoints/VAP_state_dict.pt`. Download it with:
+
+```bash
+mkdir -p VAP-main/example/checkpoints
+curl -L \
+  https://github.com/ErikEkstedt/VAP/raw/main/example/checkpoints/VAP_state_dict.pt \
+  -o VAP-main/example/checkpoints/VAP_state_dict.pt
+```
+
+You can also pass a different VAP state-dict path with `--checkpoint` or
+`--vap-ckpt`.
+
+## Data Preparation
+
+The benchmark perturbation dataset and released model checkpoints will be hosted
+on Hugging Face. If you use the released data, point the training and evaluation
+commands below to the downloaded manifests.
+
+To generate perturbations from your own conversations, prepare CSV manifests in
+the format described in `data/manifests/README.md`:
+
+- `train.csv`, `dev.csv`, and `test.csv` for FVAD training/evaluation.
+- `test_natural.csv` for perturbation generation from natural conversations.
+
+Each natural-conversation row should point to the two participant audio files and
+transcript/metadata paths when available.
+
+## Generate Perturbed Data
+
+Generate all five perturbation types:
+
+```bash
+python turnnat/scripts/build_perturbations.py make-unnatural \
+  --natural-csv data/manifests/test_natural.csv \
+  --out-root data/generated \
+  --split test \
+  --per-type 200 \
+  --types early_entry,late_response,shift_instead_of_hold,hold_instead_of_shift,excessive_backchannel \
+  --short-context
+```
+
+Outputs are written under `data/generated/`:
+
+- `manifests/test.csv`: paired natural/perturbed manifest
+- `test/audio/`: perturbed audio
+- `test/json/`: perturbation metadata (`edit_meta` in JSON for compatibility)
+- `test/natural_audio/` and `test/natural_json/`: matched natural references
+- `generated_test_rows.csv`, `test_generation_log.csv`, and `test_failures.csv`:
+  generation bookkeeping and failure reasons
+
+### Default Perturbation Logic
+
+Common defaults:
+
+- turn source: `silero`
+- one perturbation per generated clip
+- short-context crop target: `20-25s`
+- crop guard keeps the perturbed boundary and nearby turn-taking context inside the crop
+- generated WAVs are normalized to `-20 dBFS` RMS and `-1 dBFS` peak
+- splice boundaries use short fades/crossfades where audio is shifted, inserted,
+  or removed
+- inserted silence and removed speech regions are filled with nearby room tone
+  where synthetic background is needed
+
+Per-type defaults:
+
+- `early_entry`: move the responder earlier by `1.2-2.5s` at a clean A-B turn
+  transition.
+- `late_response`: delay the responder by `1.2-2.0s`; require adjacent speaker
+  and responder turns of at least `1s`, with at most `200ms` overlap.
+- `shift_instead_of_hold`: insert a short shift turn into an original same-
+  speaker hold gap of `0.3-1.0s`; inserted turn duration is `1-4s`.
+- `hold_instead_of_shift`: remove a responder turn of `1.2-8.0s`, then compact
+  the resulting hold gap to about `0.5-1.5s`.
+- `excessive_backchannel`: insert two short, distinct backchannels by default,
+  with `800ms` target spacing and no volume change. To make three-backchannel
+  examples, rerun with `--bc-insert-count 3`.
+
+These rules are deliberately not overly restrictive. For cleaner public
+datasets, curate the input natural manifest to avoid clips where one channel is
+mostly silent, transcripts are missing, or the two speakers are poorly aligned.
+
+Useful generation variants:
+
+```bash
+# One perturbation type only
+python turnnat/scripts/build_perturbations.py make-unnatural \
+  --natural-csv data/manifests/test_natural.csv \
+  --out-root data/generated_late \
+  --split test \
+  --per-type 200 \
+  --types late_response \
+  --short-context
+
+# Three inserted backchannels instead of the default two
+python turnnat/scripts/build_perturbations.py make-unnatural \
+  --natural-csv data/manifests/test_natural.csv \
+  --out-root data/generated_bc3 \
+  --split test \
+  --per-type 100 \
+  --types excessive_backchannel \
+  --bc-insert-count 3 \
+  --short-context
+
+# Sharded generation; give each worker a separate output directory
+python turnnat/scripts/build_perturbations.py make-unnatural \
+  --natural-csv data/manifests/test_natural.csv \
+  --out-root data/generated_late_shard00 \
+  --split test \
+  --per-type 200 \
+  --types late_response \
+  --num-shards 16 \
+  --shard-index 0 \
+  --short-context
+```
+
+## Try Your Own Audio
+
+`turnnat/scripts/try_audio.py` is a lightweight entry point for quick demos. It
+expects two-channel audio where channel 0 and channel 1 are the two speakers.
+Mono files are duplicated to two channels, but stereo audio is recommended.
+
+Score one input recording directly with the official DualTurn FVAD head:
+
+```bash
+python turnnat/scripts/try_audio.py score \
+  --audio path/to/conversation.wav \
+  --score-backend official-dualturn \
+  --output-dir outputs/try_audio_dualturn
+```
+
+Score one recording with a released FVAD checkpoint downloaded from Hugging Face:
+
+```bash
+python turnnat/scripts/try_audio.py score \
+  --audio path/to/conversation.wav \
+  --score-backend fvad-checkpoint \
+  --checkpoint checkpoints/turn_taking_naturalness_fvad.pt \
+  --experiment auto \
+  --output-dir outputs/try_audio_fvad
+```
+
+Compare a natural/perturbed pair. Positive `delta_nll` means the perturbed file
+has higher DialogNLL than the natural reference under the selected model:
+
+```bash
+python turnnat/scripts/try_audio.py score-pair \
+  --natural-audio path/to/natural.wav \
+  --perturbed-audio path/to/perturbed.wav \
+  --score-backend official-vap \
+  --checkpoint VAP-main/example/checkpoints/VAP_state_dict.pt \
+  --perturbation-type late_response \
+  --output-dir outputs/try_audio_pair_vap
+```
+
+For high-quality perturbation generation, use a natural manifest rather than a
+standalone wav. Transcript/metadata sidecars let the generator avoid weak
+candidates and produce cleaner timing perturbations. The same script can run one
+generation pass and immediately score the generated pairs:
+
+```bash
+python turnnat/scripts/try_audio.py perturb-and-score \
+  --natural-csv data/manifests/test_natural.csv \
+  --perturbation-type late_response \
+  --per-type 1 \
+  --score-backend fvad-checkpoint \
+  --checkpoint checkpoints/turn_taking_naturalness_fvad.pt \
+  --experiment auto \
+  --output-dir outputs/try_late_response
+```
+
+Outputs include `metrics.json`, `segment_scores.csv`, `units.csv`, and, for
+pairs, `pair_scores.csv`. Use `--score-backend official-dualturn`,
+`official-vap`, or `fvad-checkpoint` depending on which checkpoint you want to
+try.
+
+## Train FVAD Models
+
+Create `data/manifests/train.csv`, `dev.csv`, and `test.csv` using the format in
+`data/manifests/README.md`. The included configs train with standard FVAD
+train/validation loss and frame accuracy. `best.pt` is selected by validation
+loss.
+
+The training label path is shared across backbones: load two-channel audio,
+build per-channel 50 Hz Silero VAD labels, then adapt that same VAD stream to
+VAP 256-state targets or DualTurn native/all-six targets. The chunk dataset only
+loads audio and frame masks; it does not derive RMS VAD or turn-action labels.
+
+For DualTurn all-six training, first cache VAD and signal labels:
+
+```bash
+python turnnat/scripts/build_silero_vad_cache.py \
+  --manifest data/manifests/train.csv --output-dir data/cache/vad
+python turnnat/scripts/build_silero_vad_cache.py \
+  --manifest data/manifests/dev.csv --output-dir data/cache/vad --skip-existing
+python turnnat/scripts/build_silero_vad_cache.py \
+  --manifest data/manifests/test.csv --output-dir data/cache/vad --skip-existing
+
+python turnnat/scripts/build_dualturn_signal_cache.py \
+  --manifest data/manifests/train.csv \
+  --manifest data/manifests/dev.csv \
+  --manifest data/manifests/test.csv \
+  --vad-cache-dir data/cache/vad --output-dir data/cache/signals
+```
+
+Run an experiment:
+
+```bash
+python turnnat/scripts/run_fvad_experiment.py configs/train_vap_full.yaml
+python turnnat/scripts/run_fvad_experiment.py configs/train_dualturn_native_all6.yaml
+python turnnat/scripts/run_fvad_experiment.py configs/train_dualturn_fvad256_all6.yaml
+```
+
+Training checkpoints are written to `outputs/<experiment>/checkpoints/` as
+`last.pt` and `best.pt`.
+
+## Evaluate Checkpoints
+
+Score a trained FVAD checkpoint on a paired natural/perturbed manifest:
+
+```bash
+python turnnat/scripts/score_fvad_checkpoint.py \
+  --checkpoint outputs/dualturn_fvad256_all6/checkpoints/best.pt \
+  --experiment auto \
+  --manifest data/generated/manifests/test.csv \
+  --output-dir outputs/eval_dualturn_fvad256 \
+  --device cuda \
+  --batch-size 4
+```
+
+For a shared/released checkpoint, download it separately and pass its path with
+`--checkpoint`. You can list supported profile names with:
+
+```bash
+python turnnat/scripts/score_fvad_checkpoint.py --list-experiments
+```
+
+Score an upstream VAP checkpoint directly:
+
+```bash
+python turnnat/scripts/score_vap_nll_naturalness.py \
+  --unnatural-manifest data/generated/manifests/test.csv \
+  --checkpoint VAP-main/example/checkpoints/VAP_state_dict.pt \
+  --output-dir outputs/eval_vap \
+  --device cuda
+```
+
+## Metrics
+
+The scorer computes frame-level future-VAD NLL, averages it inside pre-boundary
+utterance units, and reports:
+
+| Metric | Definition | Better |
+|---|---|---|
+| `MeanNLL` | Mean NLL over all utterance units | Lower for a natural recording |
+| `TailNLL` | Mean of the worst 25% unit NLL values | Lower |
+| `DialogNLL` | `0.5 * MeanNLL + 0.5 * TailNLL` | Lower |
+| `NatScore` / `nat_score` | Dialogue-level turn-taking naturalness score, defined as `-DialogNLL` | Higher |
+| `DeltaNLL` | `perturbed DialogNLL - natural DialogNLL` | Positive/larger |
+| `Pairwise Accuracy` | Fraction of matched pairs with `DeltaNLL > 0` | Higher |
+| `C-index` | Fraction of all perturbed-vs-natural dialogue-NLL comparisons correctly ordered; ties excluded | Higher |
+
+Results are reported overall and separately for all five perturbation types.
+Output is written under `OUTPUT_DIR/step_<global_step>/`:
+
+- `metrics.json` and `metrics.csv`: aggregate metrics with variance and 95% CI
+- `pair_scores.csv`: natural/perturbed scores and `DeltaNLL` for each pair
+- `segment_scores.csv`: recording-level `MeanNLL`, `TailNLL`, `DialogNLL`, and `nat_score`
+- `units.csv`: utterance-boundary unit NLL values
+- `inference_config.json`: resolved experiment profile and checkpoint metadata
+
+These metrics are for standalone evaluation and reporting.
+
+## Samples
+
+`samples/manifest.csv` contains one natural/perturbed pair for each type:
+`early_entry`, `late_response`, `shift_instead_of_hold`,
+`hold_instead_of_shift`, and `excessive_backchannel`.
+
+Score the sample pairs with VAP:
+
+```bash
+python turnnat/scripts/score_vap_nll_naturalness.py \
+  --unnatural-manifest samples/manifest.csv \
+  --checkpoint VAP-main/example/checkpoints/VAP_state_dict.pt \
+  --output-dir outputs/sample_vap \
+  --device cuda
+```
+
+Score the official DualTurn native 8-bit head:
+
+```bash
+python turnnat/scripts/score_dualturn_fvad_nll_naturalness.py \
+  --unnatural-manifest samples/manifest.csv \
+  --output-dir outputs/sample_dualturn \
+  --device cuda
+```
+
+Benchmark dataset and model checkpoints will be released on Hugging Face.
