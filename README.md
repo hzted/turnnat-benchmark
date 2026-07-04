@@ -7,8 +7,6 @@ The public pipeline keeps perturbation generation and model evaluation separate.
 Perturbed samples are produced from data-only timing and VAD rules; checkpoint
 evaluation is run as a standalone post-training step.
 
-## TurnNat Benchmark
-
 <p align="center">
   <img src="figures/framework.png" alt="TurnNat framework overview" width="850">
 </p>
@@ -17,6 +15,12 @@ evaluation is run as a standalone post-training step.
   <em>Figure 1. Overview of the TurnNat framework.</em>
 </p>
 This repository hosts the project page and release links for the TurnNat benchmark.
+
+## TurnNat Benchmark
+Project page and Demo: https://hzted.github.io/turnnat-benchmark/
+
+This repository hosts the project page and release links for the TurnNat benchmark.
+
 
 
 ## Setup
