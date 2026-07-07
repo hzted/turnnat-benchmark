@@ -314,7 +314,7 @@ utterance units, and reports:
 |---|---|---|
 | `MeanNLL` | Mean NLL over all utterance units | Lower for a natural recording |
 | `TailNLL` | Mean of the worst 25% unit NLL values | Lower |
-| `DialogNLL` | `0.5 * MeanNLL + 0.5 * TailNLL` | Lower |
+| `DialogNLL` | `0.5 * MeanNLL + 0.5 * TailNLL` (reported in the paper) | Lower |
 | `NatScore` / `nat_score` | Dialogue-level turn-taking naturalness score, defined as `-DialogNLL` | Higher |
 | `DeltaNLL` | `perturbed DialogNLL - natural DialogNLL` | Positive/larger |
 | `Pairwise Accuracy` | Fraction of matched pairs with `DeltaNLL > 0` | Higher |
